@@ -24,6 +24,8 @@ class WordList():
         self.definition_list = []
         self.word_raw        = {}
 
+        self.sentence_limit = 10
+
         if word_id is None:
             self.word_id = self.getRandomWord()
         else:
@@ -42,7 +44,6 @@ class WordList():
         return line
 
     def printRaw(self):
-        print('foo')
         print(self.word_raw)
  
     def getDefinition(self):
@@ -65,6 +66,8 @@ class WordList():
 
         for i in word_json['results']:
             for j in i['lexicalEntries']:
+                if j['lexicalCategory'] is not None:
+                    word.append('\n' + color.BOLD + 'Category: ' + color.END + j['lexicalCategory'])
                 for k in j['entries']:
                     if 'etymologies' in k:
                         for l in k['etymologies']:
@@ -86,7 +89,7 @@ class WordList():
 
         word_id = self.word_id
 
-        print( '\n' + color.BOLD + 'Word: ' + color.END + word_id.replace('_', ' ') + '\n' )
+        print( '\n' + color.BOLD + 'Word: ' + color.END + word_id.replace('_', ' ') )
         self.printDefinition()
         print()
         self.printSentence()
@@ -97,6 +100,14 @@ class WordList():
             print(i)
 
     def printSentence(self):
+        num_sentences = len(self.sentence_list)
+        mod_number = num_sentences/self.sentence_limit
+ 
+        ##if num_sentences > self.sentence_limit:        
+        ##    for i in range(0, len(self.sentence_list)):
+        ##        if i % mod_number == 0:
+        ##            print(self.sentence_list[i])
+        ##else:
         for i in self.sentence_list:
             print(i)
 
@@ -171,8 +182,7 @@ def main():
 
     logging.info( w.word_raw )
 
-    print(showRaw)
-    if showRaw is True:
+    if showRaw:
         w.printRaw()
 
 
