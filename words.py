@@ -45,6 +45,7 @@ class WordList():
 
     def printRaw(self):
         print(self.word_raw)
+        #print(self.sentences_raw)
  
     def getDefinition(self):
 
@@ -100,14 +101,7 @@ class WordList():
             print(i)
 
     def printSentence(self):
-        num_sentences = len(self.sentence_list)
-        mod_number = num_sentences/self.sentence_limit
  
-        ##if num_sentences > self.sentence_limit:        
-        ##    for i in range(0, len(self.sentence_list)):
-        ##        if i % mod_number == 0:
-        ##            print(self.sentence_list[i])
-        ##else:
         for i in self.sentence_list:
             print(i)
 
@@ -126,6 +120,8 @@ class WordList():
         r = requests.get( url, headers = {'app_id': app_id, 'app_key': app_key} )
 
         word_json = json.loads( json.dumps(r.json()) ) 
+ 
+        self.sentences_raw = r.text
 
         for i in word_json['results']:
             for j in i['lexicalEntries']:
