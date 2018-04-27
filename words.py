@@ -1,4 +1,4 @@
-import requests, json, random, argparse
+import requests, json, random, argparse, logging
 
 class color:
     PURPLE = '\033[95m'
@@ -14,14 +14,20 @@ class color:
 
 
 class WordList():
-    def __init__(self):
+    def __init__(self, word_id=None ):
         self.app_id = 'dd21b2b2'
         self.app_key = 'f64d519c73f1c17b67b74edd17317c88'
         self.language = 'en'
 
-        self.word = None
-        self.sentence_list = []
+        self.word_id         = None
+        self.sentence_list   = []
         self.definition_list = []
+        self.word_raw        = {}
+
+        if word_id is None:
+            self.word_id = self.getRandomWord()
+        else:
+            self.word_id = word_id  
 
 
     def getRandomWord(self):
@@ -35,9 +41,13 @@ class WordList():
         line = line.replace('\n', '')
         return line
 
+    def printRaw(self):
+        print('foo')
+        print(self.word_raw)
  
-    def getDefinition(self, word_id=None):
+    def getDefinition(self):
 
+        word_id = self.word_id 
         app_id = self.app_id
         app_key = self.app_key
         language = self.language
@@ -48,6 +58,8 @@ class WordList():
         r = requests.get( url, headers = {'app_id': app_id, 'app_key': app_key} )
 
         word_json = json.loads( json.dumps(r.json()) )
+
+        self.word_raw = r.text
 
         word = []
 
@@ -65,16 +77,20 @@ class WordList():
 
         return word
 
-    def lookUpWord(self, word):
+    def lookUpWord(self):
         
-        self.definition_list  = self.getDefinition(word)
-        self.sentence_list    = self.getSentence(word)
+        self.definition_list  = self.getDefinition()
+        self.sentence_list    = self.getSentence()
        
-    def printWord(self, word_id):
+    def printWord(self):
+
+        word_id = self.word_id
+
         print( '\n' + color.BOLD + 'Word: ' + color.END + word_id.replace('_', ' ') + '\n' )
         self.printDefinition()
         print()
         self.printSentence()
+        print()
 
     def printDefinition(self):
         for i in self.definition_list:
@@ -85,8 +101,9 @@ class WordList():
             print(i)
 
 
-    def getSentence(self, word_id=None):
+    def getSentence(self):
 
+        word_id = self.word_id
         app_id = self.app_id
         app_key = self.app_key
         language = self.language
@@ -124,24 +141,39 @@ class input_var:
 ##
 def main():
 
+    logging.basicConfig(filename='/tmp/words.log')
     word      = None
+    showRaw   = None
 
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--word',          help='Word')
+    parser.add_argument('--showRaw',       help='showRaw')
 
     args = parser.parse_args(namespace=input_var)
 
-    if input_var.word is not None:          word = input_var.word
-
-    w = WordList()
+    if input_var.word is not None:          word    = input_var.word
+    if input_var.showRaw is not None:       showRaw = input_var.showRaw
 
     if word is None:
-        word = w.getRandomWord()
- 
-    w.lookUpWord(word)
-    w.printWord(word)
+        logging.info('Word input is None')
+    else:
+        logging.info('Word input is: ' + word)
 
+    if word is None:
+        w = WordList()
+    else:
+        w = WordList(word)
+
+
+    w.lookUpWord()
+    w.printWord()
+
+    logging.info( w.word_raw )
+
+    print(showRaw)
+    if showRaw is True:
+        w.printRaw()
 
 
 #########################
