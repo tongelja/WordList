@@ -1,4 +1,4 @@
-import requests, json, random, argparse, logging
+import requests, json, random, argparse, logging, time
 
 class color:
     PURPLE = '\033[95m'
@@ -69,6 +69,12 @@ class WordList():
             for j in i['lexicalEntries']:
                 if j['lexicalCategory'] is not None:
                     word.append('\n' + color.BOLD + 'Category: ' + color.END + j['lexicalCategory'])
+
+                if 'pronunciations' in j:
+                    for pronunciations in j['pronunciations']: 
+                        if 'phoneticSpelling' in pronunciations:
+                            word.append('\n' + color.BOLD + 'Phonetic Spelling: ' + color.END + pronunciations['phoneticSpelling'] )
+
                 for k in j['entries']:
                     if 'etymologies' in k:
                         for l in k['etymologies']:
@@ -119,15 +125,18 @@ class WordList():
 
         r = requests.get( url, headers = {'app_id': app_id, 'app_key': app_key} )
 
-        word_json = json.loads( json.dumps(r.json()) ) 
+        try: 
+            word_json = json.loads( json.dumps(r.json()) ) 
+
+            self.sentences_raw = r.text
+
+            for i in word_json['results']:
+                for j in i['lexicalEntries']:
+                    for k in j['sentences']:
+                        s.append( (color.BOLD + 'Sentence: ' + color.END + k['text']) )
+        except json.decoder.JSONDecodeError:
+            pass
  
-        self.sentences_raw = r.text
-
-        for i in word_json['results']:
-            for j in i['lexicalEntries']:
-                for k in j['sentences']:
-                    s.append( (color.BOLD + 'Sentence: ' + color.END + k['text']) )
-
         return s
 
 
@@ -188,6 +197,7 @@ def main():
 ##
 ##############################
 if __name__ == '__main__':
+    time.sleep(1.2)
     main()
 
 
