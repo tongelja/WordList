@@ -1,4 +1,4 @@
-import requests, json, random, argparse, logging, time
+import requests, json, random, argparse, logging, time, random
 
 class color:
     PURPLE = '\033[95m'
@@ -8,9 +8,10 @@ class color:
     GREEN = '\033[92m'
     YELLOW = '\033[93m'
     RED = '\033[91m'
-    BOLD = '\033[1m'
+    #BOLD = '\033[1m'
+    BOLD = '**'
     UNDERLINE = '\033[4m'
-    END = '\033[0m'
+    END = '**'
 
 
 class WordList():
@@ -65,25 +66,26 @@ class WordList():
 
         word = []
 
-        for i in word_json['results']:
-            for j in i['lexicalEntries']:
-                if j['lexicalCategory'] is not None:
-                    word.append('\n' + color.BOLD + 'Category: ' + color.END + j['lexicalCategory'])
+        for results in word_json['results']:
+            for lexicalEntries in results['lexicalEntries']:
+                if lexicalEntries['lexicalCategory'] is not None:
+                    word.append(color.BOLD + 'Category: ' + color.END + lexicalEntries['lexicalCategory'])
 
-                if 'pronunciations' in j:
-                    for pronunciations in j['pronunciations']: 
+                if 'pronunciations' in lexicalEntries:
+                    for pronunciations in lexicalEntries['pronunciations']: 
                         if 'phoneticSpelling' in pronunciations:
-                            word.append('\n' + color.BOLD + 'Phonetic Spelling: ' + color.END + pronunciations['phoneticSpelling'] )
+                            word.append(color.BOLD + 'Phonetic Spelling: ' + color.END + pronunciations['phoneticSpelling'] )
 
-                for k in j['entries']:
-                    if 'etymologies' in k:
-                        for l in k['etymologies']:
-                            word.append(color.BOLD + 'Etymology: ' + color.END  + l)
-                    if 'senses' in k:
-                        for l in k['senses']:
-                            if 'definitions' in l:
-                                for m in l['definitions']:
-                                    word.append(color.BOLD + 'Definition: ' + color.END  + m)
+                if 'entries' in lexicalEntries:
+                    for entries in lexicalEntries['entries']:
+                        if 'etymologies' in entries:
+                            for l in entries['etymologies']:
+                                word.append(color.BOLD + 'Etymology: ' + color.END  + l)
+                        if 'senses' in entries:
+                            for senses in entries['senses']:
+                                if 'definitions' in senses:
+                                    for definitions in senses['definitions']:
+                                        word.append(color.BOLD + 'Definition: ' + color.END  + definitions)
 
         return word
 
@@ -96,9 +98,10 @@ class WordList():
 
         word_id = self.word_id
 
-        print( '\n' + color.BOLD + 'Word: ' + color.END + word_id.replace('_', ' ') )
+        print('\n\n')
+        print('[verse]')
+        print(color.BOLD + 'Word: ' + color.END + word_id.replace('_', ' ') )
         self.printDefinition()
-        print()
         self.printSentence()
         print()
 
@@ -130,10 +133,16 @@ class WordList():
 
             self.sentences_raw = r.text
 
-            for i in word_json['results']:
-                for j in i['lexicalEntries']:
-                    for k in j['sentences']:
-                        s.append( (color.BOLD + 'Sentence: ' + color.END + k['text']) )
+            for results in word_json['results']:
+                for lexicalEntries in results['lexicalEntries']:
+                    if len(lexicalEntries['sentences']) > 5:
+                        sentence_len=5
+                    else:
+                        sentence_len=len(lexicalEntries['sentences'])
+
+                    for sentences in random.sample(lexicalEntries['sentences'], sentence_len):
+                        s.append( (color.BOLD + 'Sentence: ' + color.END + sentences['text']) )
+
         except json.decoder.JSONDecodeError:
             pass
  
@@ -197,7 +206,7 @@ def main():
 ##
 ##############################
 if __name__ == '__main__':
-    time.sleep(1.2)
+    #time.sleep(1.2)
     main()
 
 
