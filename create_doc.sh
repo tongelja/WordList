@@ -1,6 +1,6 @@
 #!/bin/bash
 
-timestamp=$( date +'%y%m%d_%H%M' )
+timestamp=$( date +'%Y%m%d_%H%M' )
 word_doc="myWords.${timestamp}.doc"
 echo " " > ${word_doc}
 counter=0
