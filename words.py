@@ -103,34 +103,42 @@ class WordList():
 
         word = []
 
-        for results in word_json['results']:
-            for lexicalEntry in results['lexicalEntries']:
-                if lexicalEntry['lexicalCategory'] is not None:
-                    word.append(color.BLUE + 'Category: ' + color.END + lexicalEntry['lexicalCategory']['text'])
+        if 'results' in word_json:
+            for results in word_json['results']:
+                word.append(color.YELLOW + '---' + color.END)
+                for lexicalEntry in results['lexicalEntries']:
+                    if lexicalEntry['lexicalCategory'] is not None:
+                        word.append(color.YELLOW + 'Category: ' + color.END + lexicalEntry['lexicalCategory']['text'])
+    
+                    if 'entries' in lexicalEntry:
+                        for entry in lexicalEntry['entries']:
+                            for pronunciation in entry['pronunciations']:
+                                if 'audioFile' in pronunciation:
+                                    mp3 = requests.get(pronunciation['audioFile'])
+                                    tmp_mp3 = '/Users/tongeljl/Downloads/wod.mp3'
+                                    with open(tmp_mp3, 'wb') as f:
+                                        f.write(mp3.content)
+    
+                                    mixer.init()
+                                    mixer.music.load(tmp_mp3)
+                                    mixer.music.play()
+    
+                                word.append(color.YELLOW + 'Phonetic Spelling: ' + color.END  + pronunciation['phoneticSpelling'])
+                            if 'etymologies' in entry:
+                                for l in entry['etymologies']:
+                                    word.append(color.YELLOW + 'Etymology: ' + color.END  + l)
+                            if 'senses' in entry:
+                                for senses in entry['senses']:
+                                    if 'definitions' in senses:
+                                        for definitions in senses['definitions']:
+                                            word.append(color.YELLOW + 'Definition: ' + color.END  + definitions)
+                                    if 'subsenses' in senses:
+                                        for subsense in senses['subsenses']:
+                                            for definition in subsense['definitions']:
+                                                word.append(color.YELLOW + 'Definition (subsense): ' + color.END  + definition)
 
-                if 'entries' in lexicalEntry:
-                    for entry in lexicalEntry['entries']:
-                        for pronunciation in entry['pronunciations']:
-                            if 'audioFile' in pronunciation:
-                                mp3 = requests.get(pronunciation['audioFile'])
-                                tmp_mp3 = '/Users/tongeljl/Downloads/wod.mp3'
-                                with open(tmp_mp3, 'wb') as f:
-                                    f.write(mp3.content)
-
-                                mixer.init()
-                                mixer.music.load(tmp_mp3)
-                                mixer.music.play()
-
-                            word.append(color.YELLOW + 'Phonetic Spelling: ' + color.END  + pronunciation['phoneticSpelling'])
-                        if 'etymologies' in entry:
-                            for l in entry['etymologies']:
-                                word.append(color.YELLOW + 'Etymology: ' + color.END  + l)
-                        if 'senses' in entry:
-                            for senses in entry['senses']:
-                                if 'definitions' in senses:
-                                    for definitions in senses['definitions']:
-                                        word.append(color.RED + 'Definition: ' + color.END  + definitions)
-
+        else:
+            print('No results found for ' + word_id.strip().lower() )
         return word
 
 
@@ -153,6 +161,7 @@ class WordList():
             self.sentences_raw = r.text
             if 'results' in word_json:
                 for results in word_json['results']:
+                    s.append( (color.PURPLE + '---' + color.END) )
                     for lexicalEntry in results['lexicalEntries']:
                         if len(lexicalEntry['sentences']) > 5:
                             sentence_len=5
@@ -160,7 +169,7 @@ class WordList():
                             sentence_len=len(lexicalEntry['sentences'])
 
                         for sentence in random.sample(lexicalEntry['sentences'], sentence_len):
-                            s.append( (color.CYAN + 'Sentence: ' + color.END + sentence['text']) )
+                            s.append( (color.PURPLE + 'Sentence: ' + color.END + sentence['text']) )
 
         except json.decoder.JSONDecodeError:
             pass
@@ -187,19 +196,11 @@ class WordList():
           
             if 'results' in word_json:
                 for results in word_json['results']:
+                    s.append( (color.GREEN + '---' + color.END) )
                     for lexicalEntry in results['lexicalEntries']:
                         for entry in lexicalEntry['entries']:
                             ##sense = entry['senses'][0]
                             for sense in entry['senses']:
-                                if 'antonyms' in sense:
-                                    if len(sense['antonyms']) > 3:
-                                        antonym_len=3
-                                    else:
-                                        antonym_len=len(sense['antonyms'])
-
-                                    for antonym in random.sample(sense['antonyms'], antonym_len):
-                                        s.append( (color.DARKCYAN + 'Antonym: ' + color.END + antonym['text']) )
-
                                 if 'synonyms' in sense:
                                     if len(sense['synonyms']) > 3:
                                         synonym_len=3
@@ -207,7 +208,16 @@ class WordList():
                                         synonym_len=len(sense['synonyms'])
 
                                     for synonym in random.sample(sense['synonyms'], synonym_len):
-                                        s.append( (color.PURPLE + 'Synonym: ' + color.END + synonym['text']) )
+                                        s.append( (color.GREEN + 'Synonym: ' + color.END + synonym['text']) )
+                                if 'antonyms' in sense:
+                                    if len(sense['antonyms']) > 3:
+                                        antonym_len=3
+                                    else:
+                                        antonym_len=len(sense['antonyms'])
+
+                                    for antonym in random.sample(sense['antonyms'], antonym_len):
+                                        s.append( (color.RED + 'Antonym: ' + color.END + antonym['text']) )
+
         except json.decoder.JSONDecodeError:
             pass
  
