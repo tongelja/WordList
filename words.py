@@ -4,8 +4,36 @@ import os
 
 with open(os.devnull, 'w') as null,  contextlib.redirect_stdout(null), contextlib.redirect_stderr(null):
     from pygame import mixer
-    
-class color:
+
+from flask import Flask, url_for, render_template
+from markupsafe import escape
+
+
+class web_color:
+    PURPLE = '<p style="color: purple;"> '
+    CYAN = '<p style="color: cyan;"> '
+    DARKCYAN = '<p style="color: cyan;"> '
+    BLUE = '<p style="color: blue;"> '
+    GREEN = '<p style="color: green;"> '
+    YELLOW = '<p style="color: yellow;"> '
+    RED = '<p style="color: red;"> '
+    BOLD = '<p style="font-weight: bold;"> '
+    UNDERLINE = '<p style="font-style: underline;"> '
+    END = ' </p> '
+
+class web_color:
+    PURPLE = ''
+    CYAN = ''
+    DARKCYAN = ''
+    BLUE = ''
+    GREEN = ''
+    YELLOW = ''
+    RED = ''
+    BOLD = ''
+    UNDERLINE = ''
+    END = ''
+
+class term_color:
     PURPLE = '\033[95m'
     CYAN = '\033[96m'
     DARKCYAN = '\033[36m'
@@ -14,22 +42,21 @@ class color:
     YELLOW = '\033[93m'
     RED = '\033[91m'
     BOLD = '\033[1m'
-    ##BOLD = '**'
     UNDERLINE = '\033[4m'
     END = '\033[0m'
-    ##END = '**'
 
 
 class WordList():
-    def __init__(self, word_id=None ):
+    def __init__(self, word_id=None, web=False ):
         self.app_id = 'dd21b2b2'
         self.app_key = 'f64d519c73f1c17b67b74edd17317c88'
         self.language = 'en'
 
-        self.word_id         = None
-        self.sentence_list   = []
+        self.word_id = None
+        self.sentence_list = []
+        self.audio_list = []
         self.definition_list = []
-        self.word_raw        = {}
+        self.word_raw = {}
 
         self.sentence_limit = 10
 
@@ -37,6 +64,11 @@ class WordList():
             self.word_id = self.getRandomWord()
         else:
             self.word_id = word_id  
+
+        if web:
+            self.color = web_color
+        else:
+            self.color = term_color
 
 
     def getRandomWord(self):
@@ -56,13 +88,15 @@ class WordList():
  
     def lookUpWord(self):
         
-        self.definition_list  = self.getDefinition()
-        self.thesaurus_list   = self.getThesaurus()
-        self.sentence_list    = self.getSentence()
+        self.definition_list, self.audio_list  = self.getDefinition()
+        self.thesaurus_list = self.getThesaurus()
+        self.sentence_list = self.getSentence()
        
+    
     def printWord(self):
 
         word_id = self.word_id
+        color = self.color
 
         print('\n')
         print(color.BOLD + color.UNDERLINE + 'Word: ' + word_id.replace('_', ' ') + color.END )
@@ -74,6 +108,19 @@ class WordList():
     def printDefinition(self):
         for i in self.definition_list:
             print(i)
+
+
+    def sayWord(self):
+        for audioFile in self.audio_list:
+            mp3 = requests.get(audioFile)
+            tmp_mp3 = '/Users/tongeljl/Downloads/wod.mp3'
+            with open(tmp_mp3, 'wb') as f:
+                f.write(mp3.content)
+    
+            mixer.init()
+            mixer.music.load(tmp_mp3)
+            mixer.music.play()
+            time.sleep(1.5)
 
     def printSentence(self):
  
@@ -91,6 +138,8 @@ class WordList():
         app_id = self.app_id
         app_key = self.app_key
         language = self.language
+        color = self.color
+
         s = []
 
         url = 'https://od-api.oxforddictionaries.com:443/api/v2/entries/' + language + '/' + word_id.strip().lower()
@@ -102,10 +151,11 @@ class WordList():
         self.word_raw = r.text
 
         word = []
+        audio = []
 
         if 'results' in word_json:
             for results in word_json['results']:
-                word.append(color.YELLOW + '---' + color.END)
+                word.append(color.YELLOW + ' '  + color.END)
                 for lexicalEntry in results['lexicalEntries']:
                     if lexicalEntry['lexicalCategory'] is not None:
                         word.append(color.YELLOW + 'Category: ' + color.END + lexicalEntry['lexicalCategory']['text'])
@@ -114,14 +164,7 @@ class WordList():
                         for entry in lexicalEntry['entries']:
                             for pronunciation in entry['pronunciations']:
                                 if 'audioFile' in pronunciation:
-                                    mp3 = requests.get(pronunciation['audioFile'])
-                                    tmp_mp3 = '/Users/tongeljl/Downloads/wod.mp3'
-                                    with open(tmp_mp3, 'wb') as f:
-                                        f.write(mp3.content)
-    
-                                    mixer.init()
-                                    mixer.music.load(tmp_mp3)
-                                    mixer.music.play()
+                                    audio.append(pronunciation['audioFile'])
     
                                 word.append(color.YELLOW + 'Phonetic Spelling: ' + color.END  + pronunciation['phoneticSpelling'])
                             if 'etymologies' in entry:
@@ -139,7 +182,7 @@ class WordList():
 
         else:
             print('No results found for ' + word_id.strip().lower() )
-        return word
+        return word, audio
 
 
     def getSentence(self):
@@ -148,6 +191,7 @@ class WordList():
         app_id = self.app_id
         app_key = self.app_key
         language = self.language
+        color = self.color
         s = []
 
 
@@ -161,7 +205,7 @@ class WordList():
             self.sentences_raw = r.text
             if 'results' in word_json:
                 for results in word_json['results']:
-                    s.append( (color.PURPLE + '---' + color.END) )
+                    s.append( (color.PURPLE + ' '  + color.END) )
                     for lexicalEntry in results['lexicalEntries']:
                         if len(lexicalEntry['sentences']) > 5:
                             sentence_len=5
@@ -183,6 +227,7 @@ class WordList():
         app_id = self.app_id
         app_key = self.app_key
         language = self.language
+        color = self.color
         s = []
 
 
@@ -196,7 +241,7 @@ class WordList():
           
             if 'results' in word_json:
                 for results in word_json['results']:
-                    s.append( (color.GREEN + '---' + color.END) )
+                    s.append( (color.GREEN + ' '  + color.END) )
                     for lexicalEntry in results['lexicalEntries']:
                         for entry in lexicalEntry['entries']:
                             ##sense = entry['senses'][0]
@@ -222,7 +267,6 @@ class WordList():
             pass
  
         return s
-
 
 class input_var:
 
@@ -266,13 +310,15 @@ def main():
         w = WordList(word)
 
 
+    if showRaw:
+        w.printRaw()
+    
     w.lookUpWord()
     w.printWord()
+    w.sayWord()
 
     logging.info( w.word_raw )
 
-    if showRaw:
-        w.printRaw()
 
 
 #########################
@@ -281,7 +327,6 @@ def main():
 ##
 ##############################
 if __name__ == '__main__':
-    #time.sleep(1.2)
     main()
 
 
