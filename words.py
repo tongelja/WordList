@@ -164,7 +164,7 @@ class WordList():
                                 if 'audioFile' in pronunciation:
                                     audio.append(pronunciation['audioFile'])
     
-                                word.append(color.YELLOW + 'Phonetic Spelling:' + color.END  + space + pronunciation['phoneticSpelling'])
+                                word.append(color.YELLOW + 'Phonetic-Spelling:' + color.END  + space + pronunciation['phoneticSpelling'])
                             if 'etymologies' in entry:
                                 for l in entry['etymologies']:
                                     word.append(color.YELLOW + 'Etymology:' + color.END  + space + l)
