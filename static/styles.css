@@ -1,11 +1,10 @@
 body {
- font-family: 'Cardo', serif;
+ font-family: 'Ariel';
  background-color: #484d5c;
  color: #c0ccd4;
- line-height: 80%;
- font-size: small;
+ line-height: 1.5;
+ font-size: normal;
 }
-
 h1, h2, h3, h4, h5, h6 {
  font-family: 'Oswald', sans-serif;
  text-transform: uppercase;

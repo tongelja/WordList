@@ -2,18 +2,19 @@
 <html lang="en">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <link href="https://fonts.googleapis.com/css?family=Cardo:400,700|Oswald" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css?family=B612:400,700" rel="stylesheet">
   <body>
     <h1> {{ word }} </h1>
     {% for item in define %}
-      <p>{{ item }}</p>
+      <br><b style="color: white">{{ ' '.join(item.split()[0]) }}</b>   <p style="display:inline; line-height:1.5">{{ ' '.join(item.split()[1:]) }}</p>
     {% endfor %}
+    <br>
     {% for item in thes %}
-      <p>{{ item }}</p>
+      <br><b style="color: white">{{ ' '.join(item.split()[0]) }}</b>   <p style="display:inline; line-height:1.5">{{ ' '.join(item.split()[1:]) }}</p>
     {% endfor %}
+    <br>
     {% for item in sent %}
-      <p>{{ item }}</p>
+      <br><b style="color: white">{{ ' '.join(item.split()[0]) }}</b>   <p style="display:inline; line-height:1.5">{{ ' '.join(item.split()[1:]) }}</p>
     {% endfor %}
   </body>
 

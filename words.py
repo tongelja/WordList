@@ -8,18 +8,18 @@ with open(os.devnull, 'w') as null,  contextlib.redirect_stdout(null), contextli
 from flask import Flask, url_for, render_template
 from markupsafe import escape
 
-
+space = ' '
 class web_color:
-    PURPLE = '<p style="color: purple;"> '
-    CYAN = '<p style="color: cyan;"> '
-    DARKCYAN = '<p style="color: cyan;"> '
-    BLUE = '<p style="color: blue;"> '
-    GREEN = '<p style="color: green;"> '
-    YELLOW = '<p style="color: yellow;"> '
-    RED = '<p style="color: red;"> '
-    BOLD = '<p style="font-weight: bold;"> '
-    UNDERLINE = '<p style="font-style: underline;"> '
-    END = ' </p> '
+    PURPLE = '\n**'
+    CYAN = '\n**'
+    DARKCYAN = '\n**'
+    BLUE = '\n**'
+    GREEN = '\n**'
+    YELLOW = '\n**'
+    RED = '\n**'
+    BOLD = '\n**'
+    UNDERLINE = '\n**'
+    END = '**'
 
 class web_color:
     PURPLE = ''
@@ -79,7 +79,7 @@ class WordList():
             line = aline
         f.close()
         
-        line = line.replace('\n', '')
+        #line = line.replace('\n', '')
         return line
 
     def printRaw(self):
@@ -98,8 +98,7 @@ class WordList():
         word_id = self.word_id
         color = self.color
 
-        print('\n')
-        print(color.BOLD + color.UNDERLINE + 'Word: ' + word_id.replace('_', ' ') + color.END )
+        print(color.BOLD + 'Word: ' + word_id.replace('_', ' ') + color.END )
         self.printDefinition()
         self.printThesaurus()
         self.printSentence()
@@ -155,10 +154,9 @@ class WordList():
 
         if 'results' in word_json:
             for results in word_json['results']:
-                word.append(color.YELLOW + ' '  + color.END)
                 for lexicalEntry in results['lexicalEntries']:
                     if lexicalEntry['lexicalCategory'] is not None:
-                        word.append(color.YELLOW + 'Category: ' + color.END + lexicalEntry['lexicalCategory']['text'])
+                        word.append(color.YELLOW + 'Category:' + color.END + space + lexicalEntry['lexicalCategory']['text'])
     
                     if 'entries' in lexicalEntry:
                         for entry in lexicalEntry['entries']:
@@ -166,19 +164,19 @@ class WordList():
                                 if 'audioFile' in pronunciation:
                                     audio.append(pronunciation['audioFile'])
     
-                                word.append(color.YELLOW + 'Phonetic Spelling: ' + color.END  + pronunciation['phoneticSpelling'])
+                                word.append(color.YELLOW + 'Phonetic Spelling:' + color.END  + space + pronunciation['phoneticSpelling'])
                             if 'etymologies' in entry:
                                 for l in entry['etymologies']:
-                                    word.append(color.YELLOW + 'Etymology: ' + color.END  + l)
+                                    word.append(color.YELLOW + 'Etymology:' + color.END  + space + l)
                             if 'senses' in entry:
                                 for senses in entry['senses']:
                                     if 'definitions' in senses:
                                         for definitions in senses['definitions']:
-                                            word.append(color.YELLOW + 'Definition: ' + color.END  + definitions)
+                                            word.append(color.YELLOW + 'Definition:' + color.END  + space + definitions)
                                     if 'subsenses' in senses:
                                         for subsense in senses['subsenses']:
                                             for definition in subsense['definitions']:
-                                                word.append(color.YELLOW + 'Definition (subsense): ' + color.END  + definition)
+                                                word.append(color.YELLOW + 'Definition (subsense):' + color.END  + space + definition)
 
         else:
             print('No results found for ' + word_id.strip().lower() )
@@ -205,7 +203,6 @@ class WordList():
             self.sentences_raw = r.text
             if 'results' in word_json:
                 for results in word_json['results']:
-                    s.append( (color.PURPLE + ' '  + color.END) )
                     for lexicalEntry in results['lexicalEntries']:
                         if len(lexicalEntry['sentences']) > 5:
                             sentence_len=5
@@ -213,7 +210,7 @@ class WordList():
                             sentence_len=len(lexicalEntry['sentences'])
 
                         for sentence in random.sample(lexicalEntry['sentences'], sentence_len):
-                            s.append( (color.PURPLE + 'Sentence: ' + color.END + sentence['text']) )
+                            s.append( (color.PURPLE + 'Sentence:' + color.END + space + sentence['text']) )
 
         except json.decoder.JSONDecodeError:
             pass
@@ -241,7 +238,6 @@ class WordList():
           
             if 'results' in word_json:
                 for results in word_json['results']:
-                    s.append( (color.GREEN + ' '  + color.END) )
                     for lexicalEntry in results['lexicalEntries']:
                         for entry in lexicalEntry['entries']:
                             ##sense = entry['senses'][0]
@@ -253,7 +249,7 @@ class WordList():
                                         synonym_len=len(sense['synonyms'])
 
                                     for synonym in random.sample(sense['synonyms'], synonym_len):
-                                        s.append( (color.GREEN + 'Synonym: ' + color.END + synonym['text']) )
+                                        s.append( (color.GREEN + 'Synonym:' + color.END + space + synonym['text']) )
                                 if 'antonyms' in sense:
                                     if len(sense['antonyms']) > 3:
                                         antonym_len=3
@@ -261,7 +257,7 @@ class WordList():
                                         antonym_len=len(sense['antonyms'])
 
                                     for antonym in random.sample(sense['antonyms'], antonym_len):
-                                        s.append( (color.RED + 'Antonym: ' + color.END + antonym['text']) )
+                                        s.append( (color.RED + 'Antonym:' + color.END + space + antonym['text']) )
 
         except json.decoder.JSONDecodeError:
             pass
@@ -307,7 +303,7 @@ def main():
     if word is None:
         w = WordList()
     else:
-        w = WordList(word)
+        w = WordList(word, False)
 
 
     if showRaw:
@@ -315,7 +311,7 @@ def main():
     
     w.lookUpWord()
     w.printWord()
-    w.sayWord()
+    #w.sayWord()
 
     logging.info( w.word_raw )
 

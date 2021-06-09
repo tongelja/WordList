@@ -6,7 +6,7 @@ echo " " > ${word_doc}
 counter=0
 
 echo
-for i in $( cat words.out ); do
+for i in $( cat words.out | sort -R ); do
     counter=$((counter+1))
 
     python3 words.py --word ${i} >> ${word_doc}  2>/dev/null
