@@ -1,2 +1,6 @@
 flask
 markupsafe
+requests
+argparse
+pygame
+
