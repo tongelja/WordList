@@ -11,4 +11,4 @@ def word():
     definition, audio  = wordlist.getDefinition()
     thesaurus = wordlist.getThesaurus()
     sentences = wordlist.getSentence()
-    return render_template('word.html', word=wordlist.word_id, define=definition, thes=thesaurus, sent=sentences)
+    return render_template('word.html', word=wordlist.word_id, define=definition, thes=thesaurus, sent=sentences, aud=audio)

@@ -2,9 +2,16 @@
 <html lang="en">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <link href="https://fonts.googleapis.com/css?family=B612:400,700" rel="stylesheet">
+  <link href="httpr://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <body>
     <h1> {{ word }} </h1>
+    {% for item in aud %}
+    <br>
+    <audio controls>
+      <source src={{ item }} type="audio/wav">
+    </audio>
+    {% endfor %}
+    <br>
     {% for item in define %}
       <br><b style="color: white">{{ ' '.join(item.split()[0]) }}</b>   <p style="display:inline; line-height:1.5">{{ ' '.join(item.split()[1:]) }}</p>
     {% endfor %}

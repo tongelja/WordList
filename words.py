@@ -311,7 +311,7 @@ def main():
     
     w.lookUpWord()
     w.printWord()
-    #w.sayWord()
+    w.sayWord()
 
     logging.info( w.word_raw )
 
