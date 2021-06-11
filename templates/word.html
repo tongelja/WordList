@@ -3,7 +3,9 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <link href="httpr://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <body>
+    <a href="."><i class="material-icons">refresh</i></a>
     <h1> {{ word }} </h1>
     {% for item in aud %}
     <br>
