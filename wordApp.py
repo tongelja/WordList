@@ -5,6 +5,9 @@ import words
 app = Flask(__name__)
 
 
+@app.route('/')
+def main():
+    return 'Hello Word'
 @app.route('/word')
 def word():
     wordlist = words.WordList(web=True)
