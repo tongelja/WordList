@@ -5,7 +5,7 @@ import words
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/word')
 def word():
     wordlist = words.WordList(web=True)
     definition, audio  = wordlist.getDefinition()
