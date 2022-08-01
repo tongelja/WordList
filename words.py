@@ -49,7 +49,7 @@ class term_color:
 class WordList():
     def __init__(self, word_id=None, web=False ):
         self.app_id = 'dd21b2b2'
-        self.app_key = '70658b2e9b2f3054726e52fba313910e'
+        self.app_key = '26042f997ae490a5058709654bf73e77'
         self.language = 'en'
 
         self.word_id = None
