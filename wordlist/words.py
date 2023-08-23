@@ -112,7 +112,7 @@ class WordList():
     def sayWord(self):
         for audioFile in self.audio_list:
             mp3 = requests.get(audioFile)
-            tmp_mp3 = '/Users/tongeljl/Downloads/wod.mp3'
+            tmp_mp3 = '/tmp/wod.mp3'
             with open(tmp_mp3, 'wb') as f:
                 f.write(mp3.content)
     
