@@ -20,13 +20,11 @@
   <header class="bar">
     <button class="back" type="button" onclick="history.back()" aria-label="Back">‹</button>
     <a class="brand" href="{{ url_for('index') }}">WordList</a>
-    <form class="search" action="{{ url_for('index') }}" onsubmit="event.preventDefault(); const w = this.q.value.trim().replace(/ /g, '_'); if (w) location.href = '{{ url_for('word', myword='') }}' + encodeURIComponent(w);">
-      <input name="q" list="words" placeholder="Look up a word…" autocomplete="off" aria-label="Look up a word">
-      <datalist id="words">
-        {% for w in all_words %}<option value="{{ w|display }}">{% endfor %}
-      </datalist>
+    <form class="search" id="search" action="{{ url_for('index') }}">
+      <input name="q" id="q" list="words" placeholder="Look up a word…" autocomplete="off" aria-label="Look up a word">
+      <datalist id="words"></datalist>
     </form>
-    <a class="button" href="{{ url_for('random_word') }}" title="Random word from your list">Random</a>
+    <a class="button" data-random href="{{ url_for('random_word') }}" title="Random word from your list">Random</a>
   </header>
   <main>
     {% block content %}{% endblock %}
@@ -38,6 +36,39 @@
   </footer>
   <script>
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+
+    // The word list is loaded once from /api/words.json (and cached offline)
+    // rather than repeated in every page.
+    let wordList = null;
+    const norm = s => s.trim().toLowerCase().replace(/[’']/g, "'").replace(/_/g, ' ');
+    function loadWords() {
+      wordList = wordList || fetch('/api/words.json').then(r => r.json()).then(list => {
+        const datalist = document.getElementById('words');
+        for (const w of list) {
+          const opt = document.createElement('option');
+          opt.value = w.word;
+          datalist.append(opt);
+        }
+        return list;
+      });
+      return wordList;
+    }
+    document.getElementById('q').addEventListener('focus', loadWords, { once: true });
+
+    document.getElementById('search').addEventListener('submit', async e => {
+      e.preventDefault();
+      const q = e.target.q.value.trim();
+      if (!q) return;
+      const list = await loadWords().catch(() => []);
+      const match = list.find(w => norm(w.word) === norm(q));
+      location.href = match ? match.url : '/word/' + encodeURIComponent(q.replace(/ /g, '_'));
+    });
+
+    document.querySelectorAll('[data-random]').forEach(link => link.addEventListener('click', async e => {
+      e.preventDefault();
+      const list = await loadWords().catch(() => []);
+      location.href = list.length ? list[Math.floor(Math.random() * list.length)].url : link.href;
+    }));
   </script>
 </body>
 </html>

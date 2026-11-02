@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Not found · WordList{% endblock %}
+{% block content %}
+<section class="intro">
+  <h1>Not in your word list</h1>
+  <p>
+    {% if static_site %}This version of WordList only has the words in your list.{% else %}There's no page at this address.{% endif %}
+    Check the spelling in the search box above, browse the <a href="{{ url_for('index') }}">full list</a>,
+    or try a <a href="{{ url_for('random_word') }}" data-random>random word</a>.
+  </p>
+</section>
+{% endblock %}

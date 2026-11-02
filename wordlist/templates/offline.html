@@ -9,26 +9,25 @@
 </section>
 
 <script>
-  caches.keys()
-    .then(names => Promise.all(names.filter(n => n.startsWith('wordlist-')).map(n => caches.open(n).then(c => c.keys()))))
-    .then(lists => lists.flat())
-    .then(requests => {
-    const words = requests
-      .map(r => new URL(r.url).pathname)
-      .filter(p => p.startsWith('/word/'))
-      .map(p => decodeURIComponent(p.slice('/word/'.length)))
-      .filter((w, i, all) => all.indexOf(w) === i)
-      .sort((a, b) => a.localeCompare(b));
-    const list = document.getElementById('saved');
+  (async () => {
+    const names = (await caches.keys()).filter(n => n.startsWith('wordlist-'));
+    const requests = (await Promise.all(names.map(n => caches.open(n).then(c => c.keys())))).flat();
+    const saved = new Set(requests.map(r => new URL(r.url).pathname).filter(p => p.startsWith('/word/')));
+
+    // Show proper names ("Hobson's choice") using the cached word list.
+    const list = await fetch('/api/words.json').then(r => r.json()).catch(() => []);
+    const words = list.filter(w => saved.has(w.url));
+
+    const ul = document.getElementById('saved');
     for (const w of words) {
       const li = document.createElement('li');
       const a = document.createElement('a');
-      a.href = '/word/' + encodeURIComponent(w);
-      a.textContent = w.replace(/_/g, ' ');
+      a.href = w.url;
+      a.textContent = w.word;
       li.append(a);
-      list.append(li);
+      ul.append(li);
     }
     document.getElementById('none').hidden = words.length > 0;
-  });
+  })();
 </script>
 {% endblock %}

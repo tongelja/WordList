@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 wordlist/.cache/
 wordlist/myWords.*.doc
+dist/

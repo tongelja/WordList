@@ -1,9 +1,10 @@
 // Service worker: makes WordList installable and keeps visited words readable offline.
 // Bump VERSION whenever the static files change so phones pick up the new ones.
-const VERSION = 'wordlist-v2';
+const VERSION = 'wordlist-v3';
 const PRECACHE = [
   '/',
-  '/offline',
+  '/offline/',
+  '/api/words.json',
   '/static/styles.css',
   '/static/manifest.webmanifest',
   '/static/icons/icon-192.png',
@@ -64,7 +65,7 @@ async function networkFirst(request) {
   } catch (err) {
     const cached = await cache.match(request);
     if (cached) return cached;
-    if (request.mode === 'navigate') return cache.match('/offline');
+    if (request.mode === 'navigate') return cache.match('/offline/');
     throw err;
   }
 }

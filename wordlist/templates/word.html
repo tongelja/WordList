@@ -80,8 +80,8 @@
 
   {% if prev %}
   <nav class="pager">
-    <a href="{{ url_for('word', myword=prev) }}">← {{ prev|display }}</a>
-    <a href="{{ url_for('word', myword=next) }}">{{ next|display }} →</a>
+    <a href="{{ word_url(prev) }}">← {{ prev|display }}</a>
+    <a href="{{ word_url(next) }}">{{ next|display }} →</a>
   </nav>
   {% endif %}
 </article>

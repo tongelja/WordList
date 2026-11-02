@@ -2,7 +2,7 @@
 {% block content %}
 <section class="intro">
   <h1>Your word list</h1>
-  <p>{{ all_words|length }} words. Search above, pick one below, or try a <a href="{{ url_for('random_word') }}">random word</a>.</p>
+  <p>{{ all_words|length }} words. Search above, pick one below, or try a <a href="{{ url_for('random_word') }}" data-random>random word</a>.</p>
   <input id="filter" class="filter" placeholder="Filter the list…" aria-label="Filter the list">
 </section>
 
@@ -14,7 +14,7 @@
 <section class="letter-group" id="letter-{{ letter }}">
   <h2>{{ letter }}</h2>
   <ul class="word-grid">
-    {% for w in words %}<li><a href="{{ url_for('word', myword=w) }}">{{ w|display }}</a></li>{% endfor %}
+    {% for w in words %}<li><a href="{{ word_url(w) }}">{{ w|display }}</a></li>{% endfor %}
   </ul>
 </section>
 {% endfor %}
