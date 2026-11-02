@@ -9,7 +9,7 @@ echo
 for i in $( cat words.out | sort -R ); do
     counter=$((counter+1))
 
-    python3 words.py --word ${i} >> ${word_doc}  2>/dev/null
+    uv run python words.py --word ${i} >> ${word_doc}  2>/dev/null
     RC=$?
 
     if [[ ${RC} -ne 0 ]]; then

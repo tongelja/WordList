@@ -1,0 +1,16 @@
+[Unit]
+Description=Download every WordList word into the cache (resumes after reboot)
+After=network-online.target wordlist.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/WordList/wordlist
+ExecStart=/home/pi/.local/bin/uv run --no-sync python prefetch.py --delay 1
+Nice=10
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

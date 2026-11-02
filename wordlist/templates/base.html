@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}WordList{% endblock %}</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/favicon-32.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+  <meta name="theme-color" content="#8a4b14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="WordList">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Lato:ital,wght@0,400;0,700;1,400&family=Gentium+Book+Plus&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <header class="bar">
+    <button class="back" type="button" onclick="history.back()" aria-label="Back">‹</button>
+    <a class="brand" href="{{ url_for('index') }}">WordList</a>
+    <form class="search" action="{{ url_for('index') }}" onsubmit="event.preventDefault(); const w = this.q.value.trim().replace(/ /g, '_'); if (w) location.href = '{{ url_for('word', myword='') }}' + encodeURIComponent(w);">
+      <input name="q" list="words" placeholder="Look up a word…" autocomplete="off" aria-label="Look up a word">
+      <datalist id="words">
+        {% for w in all_words %}<option value="{{ w|display }}">{% endfor %}
+      </datalist>
+    </form>
+    <a class="button" href="{{ url_for('random_word') }}" title="Random word from your list">Random</a>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    Definitions, pronunciations and etymologies from
+    <a href="https://en.wiktionary.org/">Wiktionary</a>, available under
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+  </footer>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+  </script>
+</body>
+</html>

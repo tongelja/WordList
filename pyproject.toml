@@ -1,21 +1,13 @@
-[tool.poetry]
+[project]
 name = "wordlist"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "Personal word list with definitions, pronunciation, etymology and examples from Wiktionary"
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.31.0"
-argparse = "^1.4.0"
-logging = "^0.4.9.6"
-pygame = "^2.5.1"
-flask = "^2.3.3"
-markupsafe = "^2.1.3"
-urllib3 = "<2.0"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires-python = ">=3.13"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "flask>=3.1.3",
+    "gunicorn>=26.2.0",
+    "markupsafe>=3.0.3",
+    "requests>=2.34.2",
+]

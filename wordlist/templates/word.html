@@ -1,30 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
+{% block title %}{{ myword|display }} · WordList{% endblock %}
+{% block content %}
+<article class="entry">
+  <div class="entry-head">
+    <h1>{{ entry.word if entry else myword|display }}</h1>
+    <button class="button say" type="button" data-word="{{ entry.title if entry else myword|display }}" title="Read the word aloud with your device's voice">🔊 Say it</button>
+  </div>
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <link href="httpr://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <body>
-    <a href="."><i class="material-icons">refresh</i></a>
-    <h1> {{ word }} </h1>
-    {% for item in aud %}
-    <br>
-    <audio controls>
-      <source src={{ item }} type="audio/wav">
-    </audio>
-    {% endfor %}
-    <br>
-    {% for item in define %}
-      <br><b style="color: white">{{ ' '.join(item.split()[0]) }}</b>   <p style="display:inline; line-height:1.5">{{ ' '.join(item.split()[1:]) }}</p>
-    {% endfor %}
-    <br>
-    {% for item in thes %}
-      <br><b style="color: white">{{ ' '.join(item.split()[0]) }}</b>   <p style="display:inline; line-height:1.5">{{ ' '.join(item.split()[1:]) }}</p>
-    {% endfor %}
-    <br>
-    {% for item in sent %}
-      <br><b style="color: white">{{ ' '.join(item.split()[0]) }}</b>   <p style="display:inline; line-height:1.5">{{ ' '.join(item.split()[1:]) }}</p>
-    {% endfor %}
-  </body>
+  {% if entry %}
+    {% if entry.pronunciations or entry.audio %}
+    <section class="pronunciation">
+      <h2>Pronunciation</h2>
+      <ul class="ipa-list">
+        {% for p in entry.pronunciations %}
+        <li><span class="ipa">{{ p.ipa }}</span>{% if p.accent %} <span class="accent">{{ p.accent }}</span>{% endif %}</li>
+        {% endfor %}
+      </ul>
+      {% if entry.audio %}
+      <div class="audio-list">
+        {% for a in entry.audio %}
+        <button class="button play" type="button" data-src="{{ a.url }}">▶ {{ a.accent }}</button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
 
-</html>
+    {% if entry.etymologies %}
+    <section class="etymology">
+      <h2>Etymology</h2>
+      {% for e in entry.etymologies %}<p>{{ e }}</p>{% endfor %}
+    </section>
+    {% endif %}
+
+    <section class="meanings">
+      <h2>Definitions</h2>
+      {% for m in entry.meanings %}
+      <div class="meaning">
+        <h3>{{ m.pos }}</h3>
+        <ol>
+          {% for d in m.definitions %}
+          <li>
+            {{ d.text }}
+            {% if d.examples %}
+            <ul class="examples">
+              {% for ex in d.examples[:3] %}<li>{{ ex }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+      {% endfor %}
+    </section>
+
+    {% macro quote(q) %}
+      <blockquote class="quote">
+        <p>{{ q.passage|safe }}</p>
+        <footer>— {{ q.author or 'Unknown' }}{% if q.work %}, <cite>{{ q.work }}</cite>{% endif %}{% if q.year %} ({{ q.year }}){% endif %}</footer>
+      </blockquote>
+    {% endmacro %}
+    {% if entry.quotations %}
+    <section class="literature">
+      <h2>From literature</h2>
+      {% for q in entry.quotations[:4] %}{{ quote(q) }}{% endfor %}
+      {% if entry.quotations|length > 4 %}
+      <details>
+        <summary>{{ entry.quotations|length - 4 }} more quotations</summary>
+        {% for q in entry.quotations[4:] %}{{ quote(q) }}{% endfor %}
+      </details>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <p class="source"><a href="{{ entry.source_url }}">View “{{ entry.title }}” on Wiktionary ↗</a></p>
+  {% else %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+
+  {% if prev %}
+  <nav class="pager">
+    <a href="{{ url_for('word', myword=prev) }}">← {{ prev|display }}</a>
+    <a href="{{ url_for('word', myword=next) }}">{{ next|display }} →</a>
+  </nav>
+  {% endif %}
+</article>
+
+<script>
+  const player = new Audio();
+  document.querySelectorAll('.play').forEach(btn =>
+    btn.addEventListener('click', () => { player.src = btn.dataset.src; player.play(); }));
+
+  const say = document.querySelector('.say');
+  if (!('speechSynthesis' in window)) say.hidden = true;
+  say.addEventListener('click', () => {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(say.dataset.word);
+    u.lang = 'en-US';
+    u.rate = 0.85;
+    speechSynthesis.speak(u);
+  });
+</script>
+{% endblock %}

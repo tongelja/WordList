@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="intro">
+  <h1>Your word list</h1>
+  <p>{{ all_words|length }} words. Search above, pick one below, or try a <a href="{{ url_for('random_word') }}">random word</a>.</p>
+  <input id="filter" class="filter" placeholder="Filter the list…" aria-label="Filter the list">
+</section>
+
+<nav class="letters">
+  {% for letter, _ in letters %}<a href="#letter-{{ letter }}">{{ letter }}</a>{% endfor %}
+</nav>
+
+{% for letter, words in letters %}
+<section class="letter-group" id="letter-{{ letter }}">
+  <h2>{{ letter }}</h2>
+  <ul class="word-grid">
+    {% for w in words %}<li><a href="{{ url_for('word', myword=w) }}">{{ w|display }}</a></li>{% endfor %}
+  </ul>
+</section>
+{% endfor %}
+
+<script>
+  document.getElementById('filter').addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('.letter-group').forEach(group => {
+      let shown = 0;
+      group.querySelectorAll('li').forEach(li => {
+        const match = li.textContent.toLowerCase().includes(q);
+        li.hidden = !match;
+        shown += match;
+      });
+      group.hidden = shown === 0;
+    });
+  });
+</script>
+{% endblock %}

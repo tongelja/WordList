@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Offline · WordList{% endblock %}
+{% block content %}
+<section class="intro">
+  <h1>You're offline</h1>
+  <p>That word hasn't been saved on this device yet. These words are available offline:</p>
+  <ul id="saved" class="word-grid"></ul>
+  <p id="none" hidden>No words saved yet. Words you open while online are kept for offline reading.</p>
+</section>
+
+<script>
+  caches.keys()
+    .then(names => Promise.all(names.filter(n => n.startsWith('wordlist-')).map(n => caches.open(n).then(c => c.keys()))))
+    .then(lists => lists.flat())
+    .then(requests => {
+    const words = requests
+      .map(r => new URL(r.url).pathname)
+      .filter(p => p.startsWith('/word/'))
+      .map(p => decodeURIComponent(p.slice('/word/'.length)))
+      .filter((w, i, all) => all.indexOf(w) === i)
+      .sort((a, b) => a.localeCompare(b));
+    const list = document.getElementById('saved');
+    for (const w of words) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '/word/' + encodeURIComponent(w);
+      a.textContent = w.replace(/_/g, ' ');
+      li.append(a);
+      list.append(li);
+    }
+    document.getElementById('none').hidden = words.length > 0;
+  });
+</script>
+{% endblock %}

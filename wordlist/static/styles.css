@@ -1,12 +1,97 @@
+:root {
+  --bg: #faf8f4;
+  --surface: #ffffff;
+  --text: #22252b;
+  --muted: #6b6f78;
+  --line: #e6e1d8;
+  --accent: #8a4b14;
+  --accent-soft: #f4e9dc;
+  --font-head: Spectral, Georgia, serif;
+  --font-body: Lato, system-ui, -apple-system, sans-serif;
+  --font-ipa: 'Gentium Book Plus', 'Charis SIL', 'Lucida Grande', serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1e23;
+    --surface: #25282e;
+    --text: #e7e3dc;
+    --muted: #9aa0a9;
+    --line: #363a42;
+    --accent: #f0b46e;
+    --accent-soft: #3a3127;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
 body {
- font-family: 'Ariel';
- background-color: #484d5c;
- color: #c0ccd4;
- line-height: 1.5;
- font-size: normal;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 var(--font-body);
 }
-h1, h2, h3, h4, h5, h6 {
- font-family: 'Oswald', sans-serif;
- text-transform: uppercase;
- color: #ffce00;
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+[hidden] { display: none !important; }
+
+.bar {
+  position: sticky; top: 0; z-index: 1;
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) calc(20px + env(safe-area-inset-right, 0px)) 12px calc(20px + env(safe-area-inset-left, 0px));
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
+/* Installed apps have no browser back button, so show our own. */
+.back { display: none; padding: 0 6px; font-size: 1.8rem; line-height: 1; color: var(--accent); background: none; border: 0; cursor: pointer; }
+@media (display-mode: standalone) { .back { display: block; } }
+/* 16px stops iPhone Safari zooming in when the search box is tapped. */
+.search input, .filter { font-size: 16px; }
+.brand { font: 600 1.3rem var(--font-head); color: var(--text); }
+.search { flex: 1; min-width: 180px; }
+.search input, .filter {
+  width: 100%; padding: 8px 12px;
+  font: inherit; color: inherit;
+  background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px;
+}
+.button {
+  display: inline-block; padding: 7px 14px;
+  font: 700 0.95rem var(--font-body);
+  color: var(--accent); background: var(--accent-soft);
+  border: 0; border-radius: 8px; cursor: pointer;
+}
+.button:hover { filter: brightness(0.96); text-decoration: none; }
+
+main { max-width: 860px; margin: 0 auto; padding: 24px 20px 48px; }
+h1, h2, h3 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; }
+h1 { font-size: 2.6rem; margin: 0; }
+h2 { font-size: 1.15rem; margin: 2rem 0 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+h3 { font-size: 1.1rem; margin: 1.2rem 0 0.3rem; font-style: italic; color: var(--accent); }
+
+.entry-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.ipa-list { list-style: none; padding: 0; margin: 0; }
+.ipa { font: 1.25rem var(--font-ipa); }
+.accent { color: var(--muted); font-size: 0.9rem; margin-left: 6px; }
+.audio-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+.meaning ol { padding-left: 1.4rem; }
+.meaning ol > li { margin-bottom: 0.6rem; }
+.examples { margin: 0.3rem 0 0; padding-left: 1rem; list-style: none; color: var(--muted); }
+.examples li { font-style: italic; border-left: 2px solid var(--line); padding-left: 10px; margin: 4px 0; }
+.quote { margin: 0 0 1.2rem; padding: 4px 0 4px 16px; border-left: 3px solid var(--accent); }
+.quote p { margin: 0; font: 1.08rem/1.55 var(--font-head); }
+.quote footer { margin-top: 4px; font-size: 0.88rem; color: var(--muted); }
+.literature summary { cursor: pointer; color: var(--accent); margin-bottom: 1rem; }
+.etymology p { margin: 0 0 0.8rem; }
+.source { margin-top: 2rem; font-size: 0.9rem; }
+.error { padding: 16px; background: var(--accent-soft); border-radius: 8px; }
+
+.pager { display: flex; justify-content: space-between; margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--line); gap: 12px; }
+
+.intro p { color: var(--muted); }
+.letters { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 16px 0; font-weight: 600; }
+.word-grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 4px 16px; }
+.letter-group h2 { color: var(--accent); }
+
+footer { max-width: 860px; margin: 0 auto; padding: 16px 20px calc(32px + env(safe-area-inset-bottom, 0px)); font-size: 0.8rem; color: var(--muted); }
