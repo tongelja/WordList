@@ -110,25 +110,26 @@ def heading_text(node):
     return h.get_text().strip() if h else None
 
 
-# Authors whose quotations are shown first, in this order.
+# Authors whose quotations are shown first, in this order:
+# classic literature, then philosophy, then everyone else (in Wiktionary's order).
 LITERARY_AUTHORS = [
-    'Shakespeare', 'King James', 'Milton', 'Chaucer', 'Spenser', 'Marlowe', 'Donne',
-    'Ben Jonson', 'Francis Bacon',
+    # Classic literature
+    'Shakespeare', 'King James', 'Milton', 'Chaucer', 'Spenser', 'Marlowe', 'Donne', 'Ben Jonson',
+    'Dryden', 'Alexander Pope', 'Jonathan Swift', 'Defoe',
+    'Samuel Johnson', 'Fielding', 'Jane Austen', 'Wordsworth', 'Coleridge', 'Byron',
+    'Shelley', 'Keats', 'Walter Scott', 'Dickens', 'Brontë', 'Thackeray', 'George Eliot',
+    'Tennyson', 'Browning', 'Hawthorne', 'Melville', 'Edgar Allan Poe', 'Whitman', 'Emily Dickinson',
+    'Mark Twain', 'Thomas Hardy', 'Henry James',
+    'Oscar Wilde', 'Robert Louis Stevenson', 'Arthur Conan Doyle', 'Joseph Conrad',
+    'Kipling', 'Edith Wharton', 'James Joyce', 'Virginia Woolf', 'Fitzgerald',
+    'Hemingway', 'Orwell', 'T. S. Eliot', 'Steinbeck', 'Faulkner', 'Nabokov',
     # Philosophers and essayists (Jowett and Florio translated Plato and Montaigne)
-    'Plato', 'Jowett', 'Aristotle', 'Marcus Aurelius', 'Seneca', 'Cicero', 'Montaigne', 'Florio',
+    'Francis Bacon', 'Plato', 'Jowett', 'Aristotle', 'Marcus Aurelius', 'Seneca', 'Cicero', 'Montaigne', 'Florio',
     'Thomas More', 'Thomas Hobbes', 'John Locke', 'David Hume', 'George Berkeley', 'Edmund Burke',
     'Adam Smith', 'Rousseau', 'Voltaire', 'Immanuel Kant', 'Mary Wollstonecraft', 'Thomas Paine',
     'Jeremy Bentham', 'John Stuart Mill', 'Ralph Waldo Emerson', 'Henry David Thoreau',
     'Thomas Carlyle', 'Schopenhauer', 'Kierkegaard', 'Nietzsche', 'William James',
     'Bertrand Russell', 'Robert Burton', 'Thomas Browne', 'Pascal',
-    # Poets and novelists
-    'Dryden', 'Alexander Pope', 'Jonathan Swift', 'Defoe',
-    'Samuel Johnson', 'Fielding', 'Jane Austen', 'Wordsworth', 'Coleridge', 'Byron',
-    'Shelley', 'Keats', 'Walter Scott', 'Dickens', 'Brontë', 'Thackeray', 'George Eliot',
-    'Tennyson', 'Browning', 'Hawthorne', 'Melville', 'Edgar Allan Poe', 'Whitman', 'Emily Dickinson', 'Mark Twain', 'Thomas Hardy', 'Henry James',
-    'Oscar Wilde', 'Robert Louis Stevenson', 'Arthur Conan Doyle', 'Joseph Conrad',
-    'Kipling', 'Edith Wharton', 'James Joyce', 'Virginia Woolf', 'Fitzgerald',
-    'Hemingway', 'Orwell', 'T. S. Eliot', 'Steinbeck', 'Faulkner', 'Nabokov',
 ]
 
 
