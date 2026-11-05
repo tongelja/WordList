@@ -1,3 +1,4 @@
+import hashlib
 import os
 import random
 import re
@@ -52,6 +53,15 @@ def resolve(myword):
 
 app.jinja_env.filters['display'] = display
 app.jinja_env.globals['word_url'] = word_url
+
+
+def asset(filename):
+    """/static/<file>?v=<hash>, so a changed file is never served from an old cache."""
+    digest = hashlib.sha1((Path(app.static_folder) / filename).read_bytes()).hexdigest()[:8]
+    return url_for('static', filename=filename, v=digest)
+
+
+app.jinja_env.globals['asset'] = asset
 
 
 @app.context_processor
