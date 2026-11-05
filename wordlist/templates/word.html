@@ -5,6 +5,7 @@
   <div class="entry-head">
     <h1>{{ entry.word if entry else myword|display }}</h1>
     <button class="button say" type="button" data-word="{{ entry.title if entry else myword|display }}" title="Read the word aloud with your device's voice">🔊 Say it</button>
+    <button class="button fav" type="button" data-word="{{ entry.word if entry else myword|display }}" data-url="{{ word_url(myword) }}" aria-pressed="false">☆ Favorite</button>
   </div>
 
   {% if entry %}
@@ -90,6 +91,15 @@
   const player = new Audio();
   document.querySelectorAll('.play').forEach(btn =>
     btn.addEventListener('click', () => { player.src = btn.dataset.src; player.play(); }));
+
+  const fav = document.querySelector('.fav');
+  const showFav = on => {
+    fav.setAttribute('aria-pressed', String(on));
+    fav.textContent = on ? '★ Favorite' : '☆ Favorite';
+    fav.title = on ? 'Remove from your favorites' : 'Add to your favorites';
+  };
+  showFav(Favorites.has(fav.dataset.url));
+  fav.addEventListener('click', () => showFav(Favorites.toggle(fav.dataset.word, fav.dataset.url)));
 
   const say = document.querySelector('.say');
   if (!('speechSynthesis' in window)) say.hidden = true;

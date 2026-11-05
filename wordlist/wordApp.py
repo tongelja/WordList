@@ -106,6 +106,11 @@ def api_words():
     return jsonify([{'word': display(w), 'url': word_url(w)} for w in WORDS])
 
 
+@app.route('/favorites/')
+def favorites():
+    return render_template('favorites.html')
+
+
 @app.route('/offline/')
 def offline():
     return render_template('offline.html')

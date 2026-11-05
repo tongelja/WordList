@@ -20,6 +20,10 @@
 {% endfor %}
 
 <script>
+  // Star the words this person has favorited.
+  const favUrls = new Set(Favorites.all().map(f => f.url));
+  document.querySelectorAll('.word-grid a').forEach(a => a.classList.toggle('is-fav', favUrls.has(a.getAttribute('href'))));
+
   document.getElementById('filter').addEventListener('input', e => {
     const q = e.target.value.trim().toLowerCase();
     document.querySelectorAll('.letter-group').forEach(group => {

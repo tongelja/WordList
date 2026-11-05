@@ -74,7 +74,7 @@ def main():
     (out / 'staticwebapp.config.json').write_text(json.dumps(AZURE_CONFIG, indent=2))
 
     client = wordApp.app.test_client()
-    pages = ['/', '/offline/', '/404.html', '/api/words.json']
+    pages = ['/', '/favorites/', '/offline/', '/404.html', '/api/words.json']
     skipped = []
     for word, slug in wordApp.WORD_TO_SLUG.items():
         try:

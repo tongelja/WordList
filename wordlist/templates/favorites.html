@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Favorites · WordList{% endblock %}
+{% block content %}
+<section class="intro">
+  <h1>Favorites</h1>
+  <p id="summary">Tap ☆ on any word to add it here.</p>
+  <div class="fav-tools" id="tools" hidden>
+    <div class="sort" role="group" aria-label="Sort">
+      <button type="button" class="button" data-sort="added" aria-pressed="true">Newest</button>
+      <button type="button" class="button" data-sort="alpha" aria-pressed="false">A–Z</button>
+    </div>
+    <a class="button" id="random-fav" href="#">Random favorite</a>
+    <button type="button" class="button" id="copy">Copy list</button>
+  </div>
+</section>
+
+<ul class="fav-list" id="list"></ul>
+<p class="hint">Favorites are saved in this browser on this device only. A home-screen app keeps a separate list from Safari.</p>
+
+<script>
+  let sort = 'added';
+  try { sort = localStorage.getItem('wordlist-fav-sort') || 'added'; } catch {}
+
+  function render() {
+    const favs = Favorites.all();
+    if (sort === 'alpha') favs.sort((a, b) => a.word.localeCompare(b.word, undefined, { sensitivity: 'base' }));
+
+    document.getElementById('summary').textContent = favs.length
+      ? `${favs.length} favorite word${favs.length === 1 ? '' : 's'}.`
+      : 'No favorites yet. Tap ☆ on any word to add it here.';
+    document.getElementById('tools').hidden = favs.length === 0;
+    document.querySelectorAll('[data-sort]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === sort)));
+
+    document.getElementById('list').replaceChildren(...favs.map(f => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = f.url;
+      a.textContent = f.word;
+      const when = document.createElement('span');
+      when.className = 'added';
+      when.textContent = new Date(f.added).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'remove';
+      remove.textContent = '×';
+      remove.title = remove.ariaLabel = `Remove ${f.word}`;
+      remove.addEventListener('click', () => { Favorites.remove(f.url); render(); });
+      li.append(a, when, remove);
+      return li;
+    }));
+  }
+
+  document.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => {
+    sort = b.dataset.sort;
+    try { localStorage.setItem('wordlist-fav-sort', sort); } catch {}
+    render();
+  }));
+
+  document.getElementById('random-fav').addEventListener('click', e => {
+    e.preventDefault();
+    const favs = Favorites.all();
+    if (favs.length) location.href = favs[Math.floor(Math.random() * favs.length)].url;
+  });
+
+  document.getElementById('copy').addEventListener('click', async e => {
+    const text = Favorites.all().map(f => f.word).join('\n');
+    try {
+      await navigator.clipboard.writeText(text);
+      e.target.textContent = 'Copied';
+    } catch {
+      e.target.textContent = 'Couldn’t copy';
+    }
+    setTimeout(() => { e.target.textContent = 'Copy list'; }, 1500);
+  });
+
+  render();
+  // Keep the list in step if it changes in another tab.
+  window.addEventListener('storage', render);
+</script>
+{% endblock %}

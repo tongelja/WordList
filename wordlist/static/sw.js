@@ -1,9 +1,11 @@
 // Service worker: makes WordList installable and keeps visited words readable offline.
 // Bump VERSION whenever the static files change so phones pick up the new ones.
-const VERSION = 'wordlist-v3';
+const VERSION = 'wordlist-v4';
 const PRECACHE = [
   '/',
   '/offline/',
+  '/favorites/',
+  '/static/favorites.js',
   '/api/words.json',
   '/static/styles.css',
   '/static/manifest.webmanifest',

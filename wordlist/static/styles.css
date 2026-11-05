@@ -87,6 +87,20 @@ h3 { font-size: 1.1rem; margin: 1.2rem 0 0.3rem; font-style: italic; color: var(
 .source { margin-top: 2rem; font-size: 0.9rem; }
 .error { padding: 16px; background: var(--accent-soft); border-radius: 8px; }
 
+.fav[aria-pressed="true"] { color: var(--surface); background: var(--accent); }
+.word-grid a.is-fav::after { content: ' ★'; font-size: 0.8em; }
+
+.fav-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sort { display: flex; gap: 4px; margin-right: 8px; }
+.sort .button[aria-pressed="false"] { background: none; color: var(--muted); }
+.fav-list { list-style: none; padding: 0; margin: 16px 0; }
+.fav-list li { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.fav-list a { flex: 1; font: 1.15rem var(--font-head); }
+.fav-list .added { color: var(--muted); font-size: 0.85rem; }
+.fav-list .remove { padding: 0 6px; font-size: 1.3rem; line-height: 1; color: var(--muted); background: none; border: 0; cursor: pointer; }
+.fav-list .remove:hover { color: var(--accent); }
+.hint { color: var(--muted); font-size: 0.85rem; }
+
 .pager { display: flex; justify-content: space-between; margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--line); gap: 12px; }
 
 .intro p { color: var(--muted); }
