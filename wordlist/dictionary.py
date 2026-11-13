@@ -192,6 +192,20 @@ def parse_quotation(citation):
     return {'year': year, 'author': author, 'work': work, 'passage': text}
 
 
+def nym_words(node):
+    """English words linked in a "Synonyms: …" line or a Synonyms/Antonyms list,
+    leaving out "see also Thesaurus:…" links."""
+    words = []
+    for span in node.select('span[lang="en"]'):
+        link = span.find_parent('a')
+        if link is not None and link.get('title', '').startswith('Thesaurus:'):
+            continue
+        text = span.get_text(' ', strip=True)
+        if text:
+            words.append(text)
+    return words
+
+
 def get_page_details(title):
     r = fetch(PARSE_URL, params={
         'action': 'parse', 'page': title, 'prop': 'text',
@@ -201,8 +215,14 @@ def get_page_details(title):
     html = r.json().get('parse', {}).get('text', '')
 
     ipa, audio, etymologies, quotations = [], [], [], []
+    nyms = {'synonym': [], 'antonym': []}
     section = None
     for node in english_section(html):
+        # Per-sense lines under a definition: "Synonyms: glad, joyful; see also Thesaurus:happy".
+        for kind in nyms:
+            for span in node.select('span.nyms.' + kind):
+                nyms[kind] += nym_words(span)
+
         for citation in node.select('div.citation-whole'):
             if (q := parse_quotation(citation)):
                 quotations.append(q)
@@ -227,12 +247,26 @@ def get_page_details(title):
                         audio.append({'url': 'https:' + src if src.startswith('//') else src,
                                       'accent': accent or 'Audio'})
 
+        elif section in ('Synonyms', 'Antonyms') and node.name in ('ul', 'ol', 'div'):
+            nyms[section[:-1].lower()] += nym_words(node)
+
         elif section and section.startswith('Etymology') and node.name == 'p':
             text = html_to_text(str(node))
             if text:
                 etymologies.append(text)
 
-    return ipa, audio, etymologies, quotations
+    return ipa, audio, etymologies, quotations, nyms['synonym'], nyms['antonym']
+
+
+def unique_words(words, headword):
+    """Drop repeats and the headword itself, keeping Wiktionary's order."""
+    seen = {headword.lower()}
+    kept = []
+    for w in words:
+        if w.lower() not in seen:
+            seen.add(w.lower())
+            kept.append(w)
+    return kept
 
 
 ALT_FORM = re.compile(r'^(Alternative|Obsolete|Archaic) (letter-case |spelling |)(form|spelling) of', re.I)
@@ -248,6 +282,22 @@ def drop_alt_forms(meanings):
     return kept
 
 
+def save_cache(word, result):
+    path = cache_path(word)
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    # Write then rename, so another server worker never reads a half-written file.
+    tmp = path.with_suffix('.tmp.{}'.format(os.getpid()))
+    tmp.write_text(json.dumps(result))
+    tmp.replace(path)
+
+
+def add_nyms(result):
+    """Fill in synonyms and antonyms for an entry cached before they were collected."""
+    *_, synonyms, antonyms = get_page_details(result['title'])
+    result['synonyms'] = unique_words(synonyms, result['title'])
+    result['antonyms'] = unique_words(antonyms, result['title'])
+
+
 def cache_path(word):
     # Bump CACHE_VERSION when the result shape changes so old entries are refetched.
     return CACHE_DIR / (CACHE_VERSION + '-' + hashlib.sha1(word.strip().encode()).hexdigest() + '.json')
@@ -259,13 +309,12 @@ def lookup(word):
     path = cache_path(word)
     if path.exists():
         result = json.loads(path.read_text())
+        if 'synonyms' not in result:
+            add_nyms(result)
+            save_cache(word, result)
     else:
         result = fetch_word(word)
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        # Write then rename, so another server worker never reads a half-written file.
-        tmp = path.with_suffix('.tmp.{}'.format(os.getpid()))
-        tmp.write_text(json.dumps(result))
-        tmp.replace(path)
+        save_cache(word, result)
 
     # Ranked here rather than when fetched, so editing LITERARY_AUTHORS applies
     # to cached words too. Ties keep Wiktionary's order (oldest first).
@@ -286,13 +335,15 @@ def fetch_word(word):
     title = found[0][0]
     meanings = [m for _, ms in found for m in ms]
 
-    ipa, audio, etymologies, quotations = [], [], [], []
+    ipa, audio, etymologies, quotations, synonyms, antonyms = [], [], [], [], [], []
     for t, _ in found:
-        p, a, e, q = get_page_details(t)
+        p, a, e, q, syn, ant = get_page_details(t)
         ipa += p
         audio += a
         etymologies += [x for x in e if not ETYMOLOGY_STUB.search(x)]
         quotations += q
+        synonyms += syn
+        antonyms += ant
         if ipa and etymologies:
             break
 
@@ -305,4 +356,6 @@ def fetch_word(word):
         'etymologies': etymologies,
         'meanings': meanings,
         'quotations': quotations,
+        'synonyms': unique_words(synonyms, title),
+        'antonyms': unique_words(antonyms, title),
     }

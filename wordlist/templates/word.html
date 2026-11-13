@@ -78,6 +78,25 @@
     </section>
     {% endif %}
 
+    {% macro nym_list(title, words) %}
+      <div class="nyms">
+        <h3>{{ title }}</h3>
+        <ul class="nym-list">
+          {% for w in words %}
+          {% set listed = listed_word(w) %}
+          <li>{% if listed %}<a class="in-list" href="{{ word_url(listed) }}">{{ w }}</a>{% else %}<a href="https://en.wiktionary.org/wiki/{{ w|replace(' ', '_')|urlencode }}">{{ w }}</a>{% endif %}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endmacro %}
+    {% if entry.synonyms or entry.antonyms %}
+    <section class="thesaurus">
+      <h2>Synonyms &amp; antonyms</h2>
+      {% if entry.synonyms %}{{ nym_list('Synonyms', entry.synonyms) }}{% endif %}
+      {% if entry.antonyms %}{{ nym_list('Antonyms', entry.antonyms) }}{% endif %}
+    </section>
+    {% endif %}
+
     <p class="source"><a href="{{ entry.source_url }}">View “{{ entry.title }}” on Wiktionary ↗</a></p>
   {% else %}
     <p class="error">{{ error }}</p>

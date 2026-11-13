@@ -103,6 +103,11 @@ h3 { font-size: 1.1rem; margin: 1.2rem 0 0.3rem; font-style: italic; color: var(
 .quote footer { margin-top: 4px; font-size: 0.88rem; color: var(--muted); }
 .literature summary { cursor: pointer; color: var(--accent); margin-bottom: 1rem; }
 .etymology p { margin: 0 0 0.8rem; }
+.nyms h3 { margin: 0 0 6px; font-size: 0.95rem; color: var(--muted); font-weight: 600; }
+.nym-list { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0 0 1rem; }
+.nym-list a { display: inline-block; padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--text); font-size: 0.92rem; }
+.nym-list a:hover { border-color: var(--accent); color: var(--accent); }
+.nym-list a.in-list { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
 .source { margin-top: 2rem; font-size: 0.9rem; }
 .error { padding: 16px; background: var(--accent-soft); border-radius: 8px; }
 

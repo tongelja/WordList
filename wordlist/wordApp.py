@@ -51,8 +51,17 @@ def resolve(myword):
     return SLUG_TO_WORD.get(myword, myword)
 
 
+LOWER_TO_WORD = {display(w).lower(): w for w in WORDS}
+
+
+def listed_word(text):
+    """The list's spelling of a synonym or antonym, if that word is in the list."""
+    return LOWER_TO_WORD.get(text.replace('’', "'").lower()) or LOWER_TO_WORD.get(text.lower())
+
+
 app.jinja_env.filters['display'] = display
 app.jinja_env.globals['word_url'] = word_url
+app.jinja_env.globals['listed_word'] = listed_word
 
 
 def asset(filename):
