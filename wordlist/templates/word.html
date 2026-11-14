@@ -84,7 +84,7 @@
         <ul class="nym-list">
           {% for w in words %}
           {% set listed = listed_word(w) %}
-          <li>{% if listed %}<a class="in-list" href="{{ word_url(listed) }}">{{ w }}</a>{% else %}<a href="https://en.wiktionary.org/wiki/{{ w|replace(' ', '_')|urlencode }}">{{ w }}</a>{% endif %}</li>
+          <li>{% if listed %}<a class="in-list" href="{{ word_url(listed) }}">{{ w }}</a>{% else %}<span>{{ w }}</span>{% endif %}</li>
           {% endfor %}
         </ul>
       </div>
